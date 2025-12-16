@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 
 public record MemberResponse(
-        @NotBlank Long userId,
+        @NotNull Long userId,
         @Email @NotBlank String email,
         @NotBlank String name,
         @NotNull ProjectRole projectRole,
