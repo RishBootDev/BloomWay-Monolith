@@ -1,11 +1,14 @@
 package com.rishbootdev.bloomway.dto.project;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.Instant;
 
 public record FileNode(
-        String path,
+        @NotBlank String path,
         Instant modifiedAt,
-        Long size,
-        String type
+        @NotNull Long size,
+        @NotBlank String type
 ) {
 }

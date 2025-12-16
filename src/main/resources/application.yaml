@@ -17,6 +17,9 @@ spring:
     database: PostgreSQL
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+
 
 server:
   port: 2030

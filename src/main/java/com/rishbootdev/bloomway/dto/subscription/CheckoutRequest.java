@@ -1,6 +1,8 @@
 package com.rishbootdev.bloomway.dto.subscription;
 
+import jakarta.validation.constraints.NotNull;
+
 public record CheckoutRequest(
-        Long planId
+        @NotNull Long planId
 ) {
 }
