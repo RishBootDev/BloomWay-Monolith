@@ -9,5 +9,4 @@ public class BloomWayApplication {
     public static void main(String[] args) {
         SpringApplication.run(BloomWayApplication.class, args);
     }
-
 }

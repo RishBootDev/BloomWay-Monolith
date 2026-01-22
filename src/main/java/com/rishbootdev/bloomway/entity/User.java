@@ -32,6 +32,9 @@ public class User implements UserDetails {
 
     String avatarUrl;
 
+    @Column(unique=true)
+    String stripeCustomerId;
+
     @CreationTimestamp
     Instant createdAt;
 

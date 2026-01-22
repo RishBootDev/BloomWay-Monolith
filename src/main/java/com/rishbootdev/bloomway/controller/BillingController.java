@@ -2,6 +2,7 @@ package com.rishbootdev.bloomway.controller;
 
 
 import com.rishbootdev.bloomway.dto.subscription.*;
+import com.rishbootdev.bloomway.service.PaymentProcessor;
 import com.rishbootdev.bloomway.service.PlanService;
 import com.rishbootdev.bloomway.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class BillingController {
 
     private final PlanService planService;
     private final SubscriptionService subscriptionService;
+    private final PaymentProcessor paymentProcessor;
 
     @GetMapping("/api/plans")
     public ResponseEntity<List<PlanResponse>> getAllPlans() {

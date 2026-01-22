@@ -21,5 +21,14 @@ jwt:
   secret-key: ${JWT_SECRET_KEY}
 
 
+stripe:
+  api:
+    secret: ${STRIPE_SECRET}
+  webhook:
+    secret: ${WEBHOOK_SECRET}
+
+client:
+  url: http:localhost:8080
+
 server:
   port: 2030

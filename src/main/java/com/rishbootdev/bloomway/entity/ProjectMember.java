@@ -3,7 +3,6 @@ package com.rishbootdev.bloomway.entity;
 import com.rishbootdev.bloomway.enums.ProjectRole;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
 
