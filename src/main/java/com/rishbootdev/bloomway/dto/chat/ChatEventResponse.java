@@ -1,5 +1,7 @@
 package com.rishbootdev.bloomway.dto.chat;
 
+import com.rishbootdev.bloomway.enums.ChatEventType;
+
 public record ChatEventResponse(
         Long id,
         ChatEventType type,
