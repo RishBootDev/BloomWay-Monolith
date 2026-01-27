@@ -23,7 +23,7 @@ public class StorageConfig {
     @Bean
     public MinioClient minioClient() {
         return MinioClient.builder()
-                //.endpoint(url)
+                .endpoint(url)
                 .credentials(accessKey, secretKey)
                 .build();
     }
