@@ -17,6 +17,15 @@ spring:
     database: PostgreSQL
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+  ai:
+    openai:
+      api-key: ${OPEN_ROUTER_API_KEY}
+      base-url: https://openrouter.ai/api
+      chat:
+        options:
+          model: google/gemini-3-flash-preview
+          temperature: 0.0
+
 jwt:
   secret-key: ${JWT_SECRET_KEY}
 
@@ -26,3 +35,9 @@ client:
 
 server:
   port: 2030
+
+minio:
+  url: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin123
+  project-bucket: projects

@@ -1,5 +1,6 @@
 package com.rishbootdev.bloomway.service.impl;
 
+
 import com.rishbootdev.bloomway.dto.project.FileContentResponse;
 import com.rishbootdev.bloomway.dto.project.FileNode;
 import com.rishbootdev.bloomway.entity.Project;
@@ -9,6 +10,7 @@ import com.rishbootdev.bloomway.mapper.ProjectFileMapper;
 import com.rishbootdev.bloomway.repository.ProjectFileRepository;
 import com.rishbootdev.bloomway.repository.ProjectRepository;
 import com.rishbootdev.bloomway.service.ProjectFileService;
+import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
@@ -36,15 +38,31 @@ public class ProjectFileServiceImpl implements ProjectFileService {
     @Value("${minio.project-bucket}")
     private String projectBucket;
 
+    private static final String BUCKET_NAME = "projects";
+
+
     @Override
-    public List<FileNode> getFileTree(Long projectId, Long userId) {
+    public List<FileNode> getFileTree(Long projectId) {
         List<ProjectFile> projectFileList = projectFileRepository.findByProjectId(projectId);
         return projectFileMapper.toListOfFileNode(projectFileList);
     }
 
     @Override
-    public FileContentResponse getFileContent(Long projectId, String path, Long userId) {
-        return null;
+    public FileContentResponse getFileContent(Long projectId, String path) {
+        String objectName = projectId + "/" + path;
+        try (
+                InputStream is = minioClient.getObject(
+                        GetObjectArgs.builder()
+                                .bucket(BUCKET_NAME)
+                                .object(objectName)
+                                .build())) {
+
+            String content = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            return new FileContentResponse(path, content);
+        } catch (Exception e) {
+            log.error("Failed to read file: {}/{}", projectId, path, e);
+            throw new RuntimeException("Failed to read file content", e);
+        }
     }
 
     @Override
@@ -73,7 +91,7 @@ public class ProjectFileServiceImpl implements ProjectFileService {
                     .orElseGet(() -> ProjectFile.builder()
                             .project(project)
                             .path(cleanPath)
-                            .minioObjectKey(objectKey) // Use the key we generated
+                            .minioObjectKey(objectKey)
                             .createdAt(Instant.now())
                             .build());
 

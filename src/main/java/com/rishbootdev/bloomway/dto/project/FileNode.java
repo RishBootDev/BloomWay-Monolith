@@ -11,4 +11,9 @@ public record FileNode(
         @NotNull Long size,
         @NotBlank String type
 ) {
+
+    @Override
+    public String toString() {
+        return path;
+    }
 }
