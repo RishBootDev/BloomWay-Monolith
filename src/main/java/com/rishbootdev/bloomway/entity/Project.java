@@ -10,30 +10,34 @@ import java.time.Instant;
 
 @Getter
 @Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "projects")
+@Table(name = "projects",
+        indexes = {
+                @Index(name = "idx_projects_updated_at_desc", columnList = "updated_at DESC, deleted_at"),
+                @Index(name = "idx_projects_deleted_at_updated_at_desc", columnList = "deleted_at, updated_at DESC"),
+                @Index(name = "idx_project_deleted_at", columnList = "deleted_at")
+        }
+)
 public class Project {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
     @Column(nullable = false)
-    private String name;
+    String name;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
-    private User owner;
-
-    private Boolean isPublic = false;
+    Boolean isPublic = false;
 
     @CreationTimestamp
-    private Instant createdAt;
+    Instant createdAt;
 
     @UpdateTimestamp
-    private Instant updatedAt;
+    Instant updatedAt;
 
-    private Instant deletedAt;
+    Instant deletedAt; //soft delete
 }

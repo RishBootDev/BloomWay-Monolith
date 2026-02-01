@@ -16,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/projects/{projectId}/members")
 @RequiredArgsConstructor
+@CrossOrigin
 public class ProjectMemberController {
 
     private final ProjectMemberService projectMemberService;

@@ -8,7 +8,7 @@ import java.time.Instant;
 public record ProjectSummaryResponse(
 
         @NotNull Long id,
-        @NotBlank String projectName,
+        @NotBlank String name,
         Instant createdAt,
         Instant updatedAt
 ) {

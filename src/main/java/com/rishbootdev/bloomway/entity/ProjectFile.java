@@ -3,40 +3,38 @@ package com.rishbootdev.bloomway.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.repository.query.FluentQuery;
+import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 
+
+@Entity
+@Table(name = "project_files")
 @Getter
 @Setter
-@Builder
-@Entity
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProjectFile {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "project_id")
-    private Project project;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id", nullable = false)
+    Project project;
 
-    private String path;
+    @Column(nullable = false)
+    String path;
 
-    private String minioObjectKey;
+    String minioObjectKey;
 
-    private Instant createdAt;
+    @CreationTimestamp
+    Instant createdAt;
 
-    private Instant updatedAt;
-
-    @ManyToOne
-    @JoinColumn(name = "created_by_id")
-    private User createdBy;
-
-    @ManyToOne
-    @JoinColumn(name = "updated_by_id")
-    private User updatedBy;
-
+    @UpdateTimestamp
+    Instant updatedAt;
 }

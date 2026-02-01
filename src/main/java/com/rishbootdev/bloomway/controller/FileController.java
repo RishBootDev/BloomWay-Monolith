@@ -3,14 +3,10 @@ package com.rishbootdev.bloomway.controller;
 
 import com.rishbootdev.bloomway.dto.project.FileContentResponse;
 import com.rishbootdev.bloomway.dto.project.FileNode;
-import com.rishbootdev.bloomway.service.FileService;
 import com.rishbootdev.bloomway.service.ProjectFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,6 +14,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/projects/{projectId}/files")
+@CrossOrigin
 public class FileController {
 
     private final ProjectFileService projectFileService;

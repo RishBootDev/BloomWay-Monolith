@@ -9,7 +9,7 @@ import java.time.Instant;
 
 public record MemberResponse(
         @NotNull Long userId,
-        @Email @NotBlank String email,
+        @NotBlank String username,
         @NotBlank String name,
         @NotNull ProjectRole projectRole,
         Instant invitedAt

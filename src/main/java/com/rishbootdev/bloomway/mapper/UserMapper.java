@@ -11,5 +11,8 @@ import org.mapstruct.Mapper;
 public interface UserMapper {
 
     User toEntity(SignupRequest signupRequest);
+
     UserProfileResponse toUserProfileResponse(User user);
+
 }
+

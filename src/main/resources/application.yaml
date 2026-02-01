@@ -31,10 +31,16 @@ jwt:
 
 
 client:
-  url: http:localhost:8080
+  url: http:localhost:5173
 
 server:
   port: 2030
+
+logging:
+  level:
+    org.springframework.ai:
+      chat.client: DEBUG
+
 
 minio:
   url: http://localhost:9000
