@@ -3,6 +3,7 @@ package com.rishbootdev.bloomway.controller;
 
 import com.rishbootdev.bloomway.dto.project.FileContentResponse;
 import com.rishbootdev.bloomway.dto.project.FileNode;
+import com.rishbootdev.bloomway.dto.project.FileTreeResponse;
 import com.rishbootdev.bloomway.service.ProjectFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,21 +15,19 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/projects/{projectId}/files")
-@CrossOrigin
 public class FileController {
 
     private final ProjectFileService projectFileService;
 
     @GetMapping
-    public ResponseEntity<List<FileNode>> getFileTree(@PathVariable Long projectId) {
+    public ResponseEntity<FileTreeResponse> getFileTree(@PathVariable Long projectId) {
         return ResponseEntity.ok(projectFileService.getFileTree(projectId));
     }
 
-    @GetMapping("/{*path}") // /src/hooks/get-user-hook.jsx
+    @GetMapping("/content")
     public ResponseEntity<FileContentResponse> getFile(
             @PathVariable Long projectId,
-            @PathVariable String path
-    ) {
+            @RequestParam String path) {
         return ResponseEntity.ok(projectFileService.getFileContent(projectId, path));
     }
 

@@ -9,9 +9,9 @@ import lombok.ToString;
 
 
 public record LoginRequest(
-        @Email
+        @NotBlank @Email
         String username,
-        @NotBlank @Size(min = 6,max=50)
+        @Size(min = 4, max = 50)
         String password
 ) {
 }

@@ -5,6 +5,7 @@ package com.rishbootdev.bloomway.mapper;
 import com.rishbootdev.bloomway.dto.project.ProjectResponse;
 import com.rishbootdev.bloomway.dto.project.ProjectSummaryResponse;
 import com.rishbootdev.bloomway.entity.Project;
+import com.rishbootdev.bloomway.enums.ProjectRole;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -15,7 +16,7 @@ public interface ProjectMapper {
 
     ProjectResponse toProjectResponse(Project project);
 
-    ProjectSummaryResponse toProjectSummaryResponse(Project project);
+    ProjectSummaryResponse toProjectSummaryResponse(Project project, ProjectRole role);
 
     List<ProjectSummaryResponse> toListOfProjectSummaryResponse(List<Project> projects);
 

@@ -1,20 +1,16 @@
 package com.rishbootdev.bloomway.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-@Entity
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Entity
 public class Plan {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +18,9 @@ public class Plan {
 
     String name;
 
+    @Column(unique = true)
     String stripePriceId;
+
     Integer maxProjects;
     Integer maxTokensPerDay;
     Integer maxPreviews;

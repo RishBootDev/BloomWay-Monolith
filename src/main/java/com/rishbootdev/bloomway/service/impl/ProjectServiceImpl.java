@@ -8,6 +8,7 @@ import com.rishbootdev.bloomway.entity.ProjectMember;
 import com.rishbootdev.bloomway.entity.ProjectMemberId;
 import com.rishbootdev.bloomway.entity.User;
 import com.rishbootdev.bloomway.enums.ProjectRole;
+import com.rishbootdev.bloomway.exceptions.BadRequestException;
 import com.rishbootdev.bloomway.exceptions.ResourceNotFoundException;
 import com.rishbootdev.bloomway.mapper.ProjectMapper;
 import com.rishbootdev.bloomway.repository.ProjectMemberRepository;
@@ -15,10 +16,14 @@ import com.rishbootdev.bloomway.repository.ProjectRepository;
 import com.rishbootdev.bloomway.repository.UserRepository;
 import com.rishbootdev.bloomway.security.AuthUtil;
 import com.rishbootdev.bloomway.service.ProjectService;
+import com.rishbootdev.bloomway.service.ProjectTemplateService;
+import com.rishbootdev.bloomway.service.SubscriptionService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -35,20 +40,26 @@ public class ProjectServiceImpl implements ProjectService {
     ProjectMapper projectMapper;
     ProjectMemberRepository projectMemberRepository;
     AuthUtil authUtil;
+    SubscriptionService subscriptionService;
+    ProjectTemplateService projectTemplateService;
 
     @Override
     public ProjectResponse createProject(ProjectRequest request) {
 
-        Long userId=authUtil.getCurrentUserId();
-        User owner = userRepository.findById(userId).orElseThrow(
-                ()-> new ResourceNotFoundException("User",userId.toString())
-        );
+        if(!subscriptionService.canCreateNewProject()) {
+            throw new BadRequestException("User cannot create a New project with current Plan, Upgrade plan now.");
+        }
+
+        Long userId = authUtil.getCurrentUserId();
+//        User owner = userRepository.findById(userId).orElseThrow(
+//                () -> new ResourceNotFoundException("User", userId.toString())
+//        );
+        User owner = userRepository.getReferenceById(userId);
 
         Project project = Project.builder()
                 .name(request.name())
                 .isPublic(false)
                 .build();
-
         project = projectRepository.save(project);
 
         ProjectMemberId projectMemberId = new ProjectMemberId(project.getId(), owner.getId());
@@ -60,31 +71,38 @@ public class ProjectServiceImpl implements ProjectService {
                 .invitedAt(Instant.now())
                 .project(project)
                 .build();
-
         projectMemberRepository.save(projectMember);
+
+        projectTemplateService.initializeProjectFromTemplate(project.getId());
 
         return projectMapper.toProjectResponse(project);
     }
 
     @Override
     public List<ProjectSummaryResponse> getUserProjects() {
-
-        Long userId= authUtil.getCurrentUserId();
-        var projects = (List<Project>) projectRepository.findAllAccessibleByUser(userId);
-        return projectMapper.toListOfProjectSummaryResponse(projects);
+        Long userId = authUtil.getCurrentUserId();
+        var projectsWithRoles = projectRepository.findAllAccessibleByUser(userId);
+        return projectsWithRoles.stream()
+                .map(p -> projectMapper.toProjectSummaryResponse(p.getProject(), p.getRole()))
+                .toList();
     }
 
     @Override
-    public ProjectResponse getUserProjectById(Long id) {
-        Long userId= authUtil.getCurrentUserId();
-        Project project = getAccessibleProjectById(id, userId);
-        return projectMapper.toProjectResponse(project);
+    @PreAuthorize("@security.canViewProject(#projectId)")
+    public ProjectSummaryResponse getUserProjectById(Long projectId) {
+        Long userId = authUtil.getCurrentUserId();
+
+        var projectWithRole = projectRepository.findAccessibleProjectByIdWithRole(projectId, userId)
+                .orElseThrow(() -> new BadRequestException("Project Not Found"));
+
+        return projectMapper.toProjectSummaryResponse(projectWithRole.getProject(), projectWithRole.getRole());
     }
 
     @Override
-    public ProjectResponse updateProject(Long id, ProjectRequest request) {
-        Long userId= authUtil.getCurrentUserId();
-        Project project = getAccessibleProjectById(id, userId);
+    @PreAuthorize("@security.canEditProject(#projectId)")
+    public ProjectResponse updateProject(Long projectId, ProjectRequest request) {
+        Long userId = authUtil.getCurrentUserId();
+        Project project = getAccessibleProjectById(projectId, userId);
 
         project.setName(request.name());
         project = projectRepository.save(project);
@@ -93,16 +111,17 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void softDelete(Long id) {
-        Long userId= authUtil.getCurrentUserId();
-        Project project = getAccessibleProjectById(id, userId);
+    @PreAuthorize("@security.canDeleteProject(#projectId)")
+    public void softDelete(Long projectId) {
+        Long userId = authUtil.getCurrentUserId();
+        Project project = getAccessibleProjectById(projectId, userId);
 
         project.setDeletedAt(Instant.now());
         projectRepository.save(project);
     }
 
     public Project getAccessibleProjectById(Long projectId, Long userId) {
-        return projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow(
-                ()-> new ResourceNotFoundException("project",projectId.toString()));
+        return projectRepository.findAccessibleProjectById(projectId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project", projectId.toString()));
     }
 }

@@ -3,11 +3,13 @@ package com.rishbootdev.bloomway.entity;
 import com.rishbootdev.bloomway.enums.ProjectRole;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
 
 @Getter
 @Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,21 +18,21 @@ import java.time.Instant;
 public class ProjectMember {
 
     @EmbeddedId
-    private ProjectMemberId id;
+    ProjectMemberId id;
 
     @ManyToOne
     @MapsId("projectId")
-    private Project project;
+    Project project;
 
     @ManyToOne
     @MapsId("userId")
-    private User user;
+    User user;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ProjectRole projectRole;
+    ProjectRole projectRole;
 
-    private Instant invitedAt;
-    private Instant acceptedAt;
+    Instant invitedAt;
+    Instant acceptedAt;
 
 }

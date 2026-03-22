@@ -3,6 +3,7 @@ package com.rishbootdev.bloomway.service.impl;
 
 import com.rishbootdev.bloomway.dto.project.FileContentResponse;
 import com.rishbootdev.bloomway.dto.project.FileNode;
+import com.rishbootdev.bloomway.dto.project.FileTreeResponse;
 import com.rishbootdev.bloomway.entity.Project;
 import com.rishbootdev.bloomway.entity.ProjectFile;
 import com.rishbootdev.bloomway.exceptions.ResourceNotFoundException;
@@ -42,9 +43,10 @@ public class ProjectFileServiceImpl implements ProjectFileService {
 
 
     @Override
-    public List<FileNode> getFileTree(Long projectId) {
+    public FileTreeResponse getFileTree(Long projectId) {
         List<ProjectFile> projectFileList = projectFileRepository.findByProjectId(projectId);
-        return projectFileMapper.toListOfFileNode(projectFileList);
+        List<FileNode> projectFileNodes = projectFileMapper.toListOfFileNode(projectFileList);
+        return new FileTreeResponse(projectFileNodes);
     }
 
     @Override

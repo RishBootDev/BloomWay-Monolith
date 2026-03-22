@@ -8,10 +8,10 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 
 public record MemberResponse(
-        @NotNull Long userId,
-        @NotBlank String username,
-        @NotBlank String name,
-        @NotNull ProjectRole projectRole,
+        Long userId,
+        String username,
+        String name,
+        ProjectRole role,
         Instant invitedAt
 ) {
 }

@@ -31,14 +31,14 @@ public class ChatMessage {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    MessageRole role;
+    MessageRole role; // USER, ASSISTANT
 
     @OneToMany(mappedBy = "chatMessage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @OrderBy("sequenceOrder ASC")
-    List<ChatEvent> events;
+    List<ChatEvent> events; // empty unless ASSISTANT role
 
     @Column(columnDefinition = "text")
-    String content;
+    String content; // NULL unless USER role
 
     Integer tokensUsed = 0;
 

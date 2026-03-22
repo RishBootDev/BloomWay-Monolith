@@ -1,4 +1,6 @@
 package com.rishbootdev.bloomway.dto.project;
 
-public class FileTreeResponse {
+import java.util.List;
+
+public record FileTreeResponse(List<FileNode> files) {
 }

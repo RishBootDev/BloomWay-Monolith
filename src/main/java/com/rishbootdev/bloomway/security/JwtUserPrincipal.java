@@ -6,7 +6,7 @@ import java.util.List;
 
 public record JwtUserPrincipal(
         Long userId,
-        String userName,
+        String username,
         List<GrantedAuthority> authorities
 ) {
 }

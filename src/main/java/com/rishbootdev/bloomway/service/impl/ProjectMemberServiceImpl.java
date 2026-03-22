@@ -15,41 +15,43 @@ import com.rishbootdev.bloomway.repository.UserRepository;
 import com.rishbootdev.bloomway.security.AuthUtil;
 import com.rishbootdev.bloomway.service.ProjectMemberService;
 import jakarta.transaction.Transactional;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
 
 @Service
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 @Transactional
 public class ProjectMemberServiceImpl implements ProjectMemberService {
 
-    private final ProjectMemberRepository projectMemberRepository;
-    private final ProjectRepository projectRepository;
-    private final ProjectMemberMapper projectMemberMapper;
-    private final UserRepository userRepository;
-    private final AuthUtil authUtil;
+    ProjectMemberRepository projectMemberRepository;
+    ProjectRepository projectRepository;
+    ProjectMemberMapper projectMemberMapper;
+    UserRepository userRepository;
+    AuthUtil authUtil;
 
     @Override
+    @PreAuthorize("@security.canViewMembers(#projectId)")
     public List<MemberResponse> getProjectMembers(Long projectId) {
-
-        Long userId= authUtil.getCurrentUserId();
-        Project project = getAccessibleProjectById(projectId, userId);
-
         return projectMemberRepository.findByIdProjectId(projectId)
-                        .stream()
-                        .map(projectMemberMapper::toProjectMemberResponseFromMember)
-                        .toList();
+                .stream()
+                .map(projectMemberMapper::toProjectMemberResponseFromMember)
+                .toList();
     }
 
     @Override
+    @PreAuthorize("@security.canManageMembers(#projectId)")
     public MemberResponse inviteMember(Long projectId, InviteMemberRequest request) {
-        long userId=authUtil.getCurrentUserId();
+        Long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleProjectById(projectId, userId);
 
-        User invitee=userRepository.findUserByNameIs(request.username()).orElseThrow(()->new RuntimeException(" Not found User"));
+        User invitee = userRepository.findByUsername(request.username()).orElseThrow();
 
         if(invitee.getId().equals(userId)) {
             throw new RuntimeException("Cannot invite yourself");
@@ -75,8 +77,9 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
+    @PreAuthorize("@security.canManageMembers(#projectId)")
     public MemberResponse updateMemberRole(Long projectId, Long memberId, UpdateMemberRoleRequest request) {
-        Long userId= authUtil.getCurrentUserId();
+        Long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleProjectById(projectId, userId);
 
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId, memberId);
@@ -90,6 +93,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     @Override
+    @PreAuthorize("@security.canManageMembers(#projectId)")
     public void removeProjectMember(Long projectId, Long memberId) {
         Long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleProjectById(projectId, userId);
@@ -102,7 +106,6 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     }
 
     public Project getAccessibleProjectById(Long projectId, Long userId) {
-        return projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow(
-                ()-> new ResourceNotFoundException("Project ",projectId.toString()));
+        return projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow();
     }
 }

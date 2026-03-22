@@ -1,12 +1,15 @@
 package com.rishbootdev.bloomway.controller;
 
 
+import com.rishbootdev.bloomway.dto.deploy.DeployResponse;
 import com.rishbootdev.bloomway.dto.project.ProjectRequest;
 import com.rishbootdev.bloomway.dto.project.ProjectResponse;
 import com.rishbootdev.bloomway.dto.project.ProjectSummaryResponse;
 import com.rishbootdev.bloomway.security.AuthUtil;
 import com.rishbootdev.bloomway.service.ProjectService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,40 +19,40 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/projects")
 @RequiredArgsConstructor
-@CrossOrigin
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final DeploymentService deploymentService;
 
     @GetMapping
     public ResponseEntity<List<ProjectSummaryResponse>> getMyProjects() {
-
         return ResponseEntity.ok(projectService.getUserProjects());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectResponse> getProjectById(@PathVariable Long id) {
-
+    public ResponseEntity<ProjectSummaryResponse> getProjectById(@PathVariable Long id) {
         return ResponseEntity.ok(projectService.getUserProjectById(id));
     }
 
     @PostMapping
-    public ResponseEntity<ProjectResponse> createProject(@RequestBody ProjectRequest request) {
-
+    public ResponseEntity<ProjectResponse> createProject(@RequestBody @Valid ProjectRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(request));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ProjectResponse> updateProject(@PathVariable Long id, @RequestBody ProjectRequest request) {
-
+    public ResponseEntity<ProjectResponse> updateProject(@PathVariable Long id, @RequestBody @Valid ProjectRequest request) {
         return ResponseEntity.ok(projectService.updateProject(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
-
         projectService.softDelete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/deploy")
+    public ResponseEntity<DeployResponse> deployProject(@PathVariable Long id) {
+        return ResponseEntity.ok(deploymentService.deploy(id));
     }
 
 }
