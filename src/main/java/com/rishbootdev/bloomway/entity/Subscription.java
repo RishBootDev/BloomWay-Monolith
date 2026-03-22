@@ -1,29 +1,47 @@
 package com.rishbootdev.bloomway.entity;
 
 import com.rishbootdev.bloomway.enums.SubscriptionStatus;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 
 @Getter
 @Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Subscription {
 
-    private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
-    private User user;
-    private Plan plan;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false, name = "user_id")
+    User user;
 
-    private SubscriptionStatus status;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false, name = "plan_id")
+    Plan plan;
 
-    private String stripeCustomerId;
-    private String stripeSubscriptionId;
+    @Enumerated(value = EnumType.STRING)
+    SubscriptionStatus status;
 
-    private Instant currentPeriodStart;
-    private Instant currentPeriodEnd;
-    private Boolean cancelAtPeriodEnd = false;
+    String stripeSubscriptionId;
 
-    private Instant createdAt;
-    private Instant updatedAt;
+    Instant currentPeriodStart;
+    Instant currentPeriodEnd;
+    Boolean cancelAtPeriodEnd = false;
+
+    @CreationTimestamp
+    Instant createdAt;
+
+    @UpdateTimestamp
+    Instant updatedAt;
 }

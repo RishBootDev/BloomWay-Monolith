@@ -1,27 +1,35 @@
 package com.rishbootdev.bloomway.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 
+
+@Entity
+@Table(name = "usage_logs", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "date"}) // One log per user per day
+})
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UsageLog {
 
-    private Long id;
-    private User user;
-    private Project project;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
-    private String action;
+    @Column(name = "user_id", nullable = false)
+    Long userId;
 
-    private Integer tokensUsed;
-    private Integer durationMs;
+    @Column(nullable = false)
+    LocalDate date;
 
-    private String metaData; // JSON of {model_used, prompt_used},
-
-    private Instant createdAt;
+    Integer tokensUsed;
 }
